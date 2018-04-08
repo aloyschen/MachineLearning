@@ -7,7 +7,6 @@ Introduction:
 Author: gaochen
 Date: 2018.04.06
 """
-import os
 import cv2
 import Config
 import time

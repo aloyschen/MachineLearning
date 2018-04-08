@@ -29,6 +29,7 @@ if not os.path.exists(output_path):
 
 # 图像大小
 img_rows, img_cols = 28, 28
+channels = 1
 
 # 传统模型训练参数
 model_name_param_dict = {'kNN': (KNeighborsClassifier(),
@@ -50,3 +51,7 @@ model_name_param_dict = {'kNN': (KNeighborsClassifier(),
 cnn_model_dir = './cnn_model'
 if not os.path.exists(cnn_model_dir):
     os.makedirs(cnn_model_dir)
+# CNN训练参数
+batch_size = 256
+epochs = 10
+iter_nums = 20000

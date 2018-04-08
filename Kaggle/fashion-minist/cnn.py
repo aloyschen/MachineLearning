@@ -23,13 +23,18 @@ def load_data(path):
         X: 数据集特征
         y: 数据集样本
     """
+    features, labels = [], []
     data = pd.read_csv(path)
-    X = data.iloc[:, :-1].values.astype(np.float32)
-    y = data.iloc[:, 0].values.astype(np.float32)
-    return X, y
+    sample_numbers = data.shape[0]
+    for num in range(sample_numbers):
+        feature = data.iloc[num, :-1].values.astype(np.float32).reshape(Config.img_rows, Config.img_cols)
+        label = data.iloc[num, 0].astype(np.int32)
+        features.append(feature)
+        labels.append(label)
+    return np.asarray(features), np.asarray(labels)
 
 
-def cnn_model(features, labels, n_classes, mode):
+def cnn_model(features, labels, mode):
     """
     构建CNN模型:
         -conv1
@@ -40,6 +45,7 @@ def cnn_model(features, labels, n_classes, mode):
         -dropout
         -logits
     """
+    features = tf.reshape(features, [-1, Config.img_rows, Config.img_cols, Config.channels])
     # 卷积层 #1
     conv1 = tf.layers.conv2d(inputs = features, filters = 32, kernel_size = [5, 5], kernel_initializer = tf.truncated_normal_initializer(stddev = 0.1), padding = 'same', activation = tf.nn.relu)
 
@@ -63,7 +69,7 @@ def cnn_model(features, labels, n_classes, mode):
     logits = tf.layers.dense(inputs = dropout, units = n_classes)
 
     predictions = {
-        'classes' : tf.argmax(input = logits, axis = 1)
+        'classes' : tf.argmax(input = logits, axis = 1),
         'probabilitues' : tf.nn.softmax(logits, name = 'softmax_tensor')
     }
     # 如果是预测直接输出预测结果
@@ -84,13 +90,33 @@ def cnn_model(features, labels, n_classes, mode):
 
 def train():
     """
-
-    :return:
+    使用estimator.Estimator构建训练器，训练cnn模型
     """
+
     train_features, train_labels = load_data(Config.train_data_file)
     eval_features, eval_labels = load_data(Config.test_data_file)
-    fishion_classifier = tf.estimator.Estimator(model_fn = cnn_model, model_dir = Config.model_dir)
+    fishion_classifier = tf.estimator.Estimator(model_fn = cnn_model, model_dir = Config.cnn_model_dir)
+    #设置打印log参数
+    tensors_to_log = {"probabilities" : "softmax_tensor"}
+    logging_hook = tf.train.LoggingTensorHook(tensors = tensors_to_log, every_n_iter = 50)
+    train_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x = {"x" : train_features},
+        y = train_labels,
+        batch_size = Config.batch_size,
+        num_epochs = Config.epochs,
+        shuffle = True
+    )
+    fishion_classifier.train(train_input_fn, steps = Config.iter_nums, hooks = [logging_hook])
+    #评估测试集
+    eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+        x = {"x" : eval_features},
+        y = eval_labels,
+        num_epochs = 1,
+        shuffle = False
+    )
+    eval_results = fishion_classifier.predict(eval_input_fn)
+    print(eval_results)
 
 
-
-load_data()
+if __name__ == "__main__":
+    train()
