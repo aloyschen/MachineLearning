@@ -10,22 +10,13 @@
 .classpath
 .project
 .idea
-data.modelsamples10w.txt
-java_study.iml
 / __pycache__
 **/*.pyc
 /logs/
 /lib/
-train.txt
-test.txt
-filter.txt
 /spark-warehouse/
-split_pic_for_train.py
-fuck_predict.py
-guangzhou.py
 /data/
 /result/
 /gt/
 live_hot_statistic.py
-plotbar.py
-
+/Kaggle/fashion-minist/data/*
