@@ -30,7 +30,7 @@ if not os.path.exists(output_path):
 # 图像大小
 img_rows, img_cols = 28, 28
 
-# 训练模型参数
+# 传统模型训练参数
 model_name_param_dict = {'kNN': (KNeighborsClassifier(),
                                  {'n_neighbors': [5, 25, 55]}),
                          'LR': (LogisticRegression(),
@@ -45,3 +45,8 @@ model_name_param_dict = {'kNN': (KNeighborsClassifier(),
                                   {'learning_rate': [0.01, 1, 100]}),
                          'RF': (RandomForestClassifier(),
                                 {'n_estimators': [100, 150, 200]})}
+
+# CNN模型路径
+cnn_model_dir = './cnn_model'
+if not os.path.exists(cnn_model_dir):
+    os.makedirs(cnn_model_dir)
