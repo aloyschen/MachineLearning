@@ -6,12 +6,13 @@ Introduction
 Author: gaochen
 Date: 2018.04.08
 """
-
+import os
 import numpy as np
 import pandas as pd
 import Config
 import tensorflow as tf
 
+os.environ['CUDA_VISIBLE_DEVICES'] = str(Config.GPU)
 def load_data(path):
     """
     读取数据集数据
@@ -45,7 +46,9 @@ def cnn_model(features, labels, mode):
         -dropout
         -logits
     """
-    features = tf.reshape(features, [-1, Config.img_rows, Config.img_cols, Config.channels])
+    print(features)
+    features = tf.reshape(features['x'], [-1, Config.img_rows, Config.img_cols, Config.channels])
+
     # 卷积层 #1
     conv1 = tf.layers.conv2d(inputs = features, filters = 32, kernel_size = [5, 5], kernel_initializer = tf.truncated_normal_initializer(stddev = 0.1), padding = 'same', activation = tf.nn.relu)
 
@@ -66,7 +69,7 @@ def cnn_model(features, labels, mode):
     dropout = tf.layers.dropout(inputs = dense, rate = 0.4, training = mode == tf.estimator.ModeKeys.TRAIN)
 
     # logits层
-    logits = tf.layers.dense(inputs = dropout, units = n_classes)
+    logits = tf.layers.dense(inputs = dropout, units = Config.n_classes)
 
     predictions = {
         'classes' : tf.argmax(input = logits, axis = 1),
@@ -92,13 +95,13 @@ def train():
     """
     使用estimator.Estimator构建训练器，训练cnn模型
     """
-
     train_features, train_labels = load_data(Config.train_data_file)
     eval_features, eval_labels = load_data(Config.test_data_file)
     fishion_classifier = tf.estimator.Estimator(model_fn = cnn_model, model_dir = Config.cnn_model_dir)
     #设置打印log参数
-    tensors_to_log = {"probabilities" : "softmax_tensor"}
-    logging_hook = tf.train.LoggingTensorHook(tensors = tensors_to_log, every_n_iter = 50)
+    tf.logging.set_verbosity(tf.logging.INFO)
+    #tensors_to_log = {"probabilities" : "softmax_tensor"}
+    #logging_hook = tf.train.LoggingTensorHook(tensors = tensors_to_log, every_n_iter = 50)
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x = {"x" : train_features},
         y = train_labels,
@@ -106,7 +109,7 @@ def train():
         num_epochs = Config.epochs,
         shuffle = True
     )
-    fishion_classifier.train(train_input_fn, steps = Config.iter_nums, hooks = [logging_hook])
+    fishion_classifier.train(train_input_fn, steps = Config.iter_nums)
     #评估测试集
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x = {"x" : eval_features},
@@ -114,7 +117,7 @@ def train():
         num_epochs = 1,
         shuffle = False
     )
-    eval_results = fishion_classifier.predict(eval_input_fn)
+    eval_results = fishion_classifier.evaluate(eval_input_fn)
     print(eval_results)
 
 

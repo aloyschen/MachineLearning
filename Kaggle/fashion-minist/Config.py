@@ -30,6 +30,7 @@ if not os.path.exists(output_path):
 # 图像大小
 img_rows, img_cols = 28, 28
 channels = 1
+n_classes = 10
 
 # 传统模型训练参数
 model_name_param_dict = {'kNN': (KNeighborsClassifier(),
@@ -55,3 +56,6 @@ if not os.path.exists(cnn_model_dir):
 batch_size = 256
 epochs = 10
 iter_nums = 20000
+
+# GPU设置
+GPU=2
