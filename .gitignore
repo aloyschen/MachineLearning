@@ -20,3 +20,5 @@
 /gt/
 live_hot_statistic.py
 /Kaggle/fashion-minist/data/*
+/ConvolutionalPoseMachine/dataset/*
+/VideoClassification/data/*

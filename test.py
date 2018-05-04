@@ -2,7 +2,7 @@ import time
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-
+from skimage import transform
 
 def CenterLabelHeatMap(img_width, img_height, c_x, c_y, sigma):
     X1 = np.linspace(1, img_width, img_width)
@@ -29,28 +29,7 @@ def CenterGaussianHeatMap(img_height, img_width, c_x, c_y, variance):
             gaussian_map[y_p, x_p] = np.exp(-exponent)
     return gaussian_map
 
-
-image_file = '/Users/gaochen3/sina_study/machineLearning/VideoClassification/data/test.jpg'
-img = cv2.imread(image_file)
-img = img[:,:,::-1]
-
-height, width,_ = np.shape(img)
-cy, cx = height//2, width//2
-
-start = time.time()
-heatmap1 = CenterLabelHeatMap(width, height, cx, cy, int(np.sqrt(width) * width * 10 / 4096) + 2)
-t1 = time.time() - start
-
-start = time.time()
-heatmap2 = CenterGaussianHeatMap(height, width, cx, cy, int(np.sqrt(width) * width * 10 / 4096) + 2)
-t2 = time.time() - start
-
-print(t1, t2)
-
-plt.subplot(1,2,1)
-plt.imshow(heatmap1)
-plt.subplot(1,2,2)
-plt.imshow(heatmap2)
-plt.show()
-
-print('End.')
+arr = np.random.rand(2, 3, 2)
+print(arr)
+print('sum:', np.sum(arr, axis = 2))
+print('max: ', np.repeat(arr, 2, axis = 2))
