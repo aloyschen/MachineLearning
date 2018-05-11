@@ -363,7 +363,8 @@ class DataGenerator(object):
             padd, crop_box = self._crop_data(img.shape[0], img.shape[1], box, joints, boxp=0.2)
             relative_joints = self._relative_joints(crop_box, padd, joints,toSize=self.out_size)
             heatMap = self._generate_heatMap(self.out_size, relative_joints, weights)
-            img = np.pad(img, padd, mode = 'constans')
+
+            img = np.pad(img, padd, mode = 'constant')
             max_length = max(crop_box[2], crop_box[3])
             img = img[crop_box[1] - max_length // 2:crop_box[1] + max_length // 2, crop_box[0] - max_length // 2:crop_box[0] + max_length // 2]
             img = scm.imresize(img, (self.in_size, self.in_size))
