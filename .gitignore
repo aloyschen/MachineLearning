@@ -23,3 +23,4 @@ live_hot_statistic.py
 /ConvolutionalPoseMachine/dataset/*
 /VideoClassification/data/*
 /lstm_coinbase/data/price.csv
+/data/*
