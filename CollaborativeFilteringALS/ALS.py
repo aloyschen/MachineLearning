@@ -3,7 +3,7 @@
 # Date: 2018.05.28
 
 import implicit
-import config
+import CollaborativeFilteringALS.config as config
 import logging
 import time
 import pandas as pd
@@ -128,7 +128,7 @@ def save_uid_zuid(data, path):
 
 
 if __name__ == '__main__':
-    calculate_similar_zuid(config.data_file, config.save_file, config.factors, config.iterations, config.regularization, config.use_gpu, config.num_threads, config.calculate_training_loss)
+    calculate_similar_zuid(config.data_path, config.save_file, config.factors, config.iterations, config.regularization, config.use_gpu, config.num_threads, config.calculate_training_loss)
 
 
 

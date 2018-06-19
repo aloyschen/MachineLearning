@@ -1,7 +1,7 @@
 # 训练数据文件
 data_path = './data/push_data_500000'
 # 存储结果路径文件
-save_path = './data/uid_similar_zuids'
+save_file = './data/uid_similar_zuids'
 # 矩阵分解因子数量
 factors = 100
 # 训练迭代次数
