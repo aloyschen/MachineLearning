@@ -4,6 +4,7 @@ import logging.handlers
 import multiprocessing
 import mcqToKafka.config as config
 from kafka import KafkaProducer
+import argparse
 
 
 
@@ -61,7 +62,7 @@ def listener_process(queue, config):
 
 
 class McqToKafka:
-    def __init__(self, McqSevers, KafkaSevers, McqTopic, KafkaTopic,):
+    def __init__(self, McqSever, KafkaSevers, McqTopic, KafkaTopic, process_num):
         """
         Introduction
         ------------
@@ -73,10 +74,11 @@ class McqToKafka:
             KafkaTopic: kafka的topic
             kafkaSevers: kafka的域名
         """
-        self.McqSevers = McqSevers
+        self.McqSever = McqSever
         self.KafkaSevers = KafkaSevers
         self.McqTopic = McqTopic
         self.KafkaTopic = KafkaTopic
+        self.process_num = process_num
 
 
     def worker_process(self, queue, config, mcqServer):
@@ -113,8 +115,8 @@ class McqToKafka:
         listener = multiprocessing.Process(target = listener_process, args = (queue, listener_config))
         listener.start()
         workers = []
-        for McqSever in self.McqSevers:
-            worker = multiprocessing.Process(target = self.worker_process,args = (queue, worker_config, McqSever))
+        for _ in range(self.process_num):
+            worker = multiprocessing.Process(target = self.worker_process,args = (queue, worker_config, self.McqSever))
             workers.append(worker)
             worker.start()
         for w in workers:
@@ -123,5 +125,13 @@ class McqToKafka:
         listener.join()
 
 if __name__ == '__main__':
-    McqToKafka = McqToKafka(config.McqServers, config.KafkaServers, config.McqKey, config.KafkaTopic)
-    McqToKafka.multiproces()
+    parser = argparse.ArgumentParser(description='Read mcq and write kafka')
+    parser.add_argument('McqServers', metavar='N', type=str, nargs='+',
+                        help='Mcq Severs (tc or yf)')
+    args = parser.parse_args()
+    if args.McqServers == 'tc':
+        McqToKafka = McqToKafka(config.McqServerstc, config.KafkaServers, config.McqKey, config.KafkaTopic, config.process_num)
+        McqToKafka.multiproces()
+    if args.McqServers == 'yf':
+        McqToKafka = McqToKafka(config.McqServerstc, config.KafkaServers, config.McqKey, config.KafkaTopic, config.process_num)
+        McqToKafka.multiproces()
